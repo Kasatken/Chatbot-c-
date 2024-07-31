@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -9,6 +9,7 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 class Program
 {
@@ -60,9 +61,10 @@ class Program
         {
             await botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: $"Привет, {username} 👋, это мой для поиска данных в Excel. Напишите /search для поиска",
+                text: $"Привет, {username} 👋, этот бот для поиска данных в Excel. Напишите /search для поиска",
                 cancellationToken: cancellationToken
             );
+            await HandleStartCommandAsync(chatId, cancellationToken);
         }
         else if (messageText.StartsWith("/search ", StringComparison.OrdinalIgnoreCase))
         {
@@ -81,6 +83,14 @@ class Program
         }
 
         else if (messageText.ToLower() == "/contacts")
+        {
+            await HandleContactsCommandAsync(chatId, cancellationToken);
+        }
+        else if (messageText.ToLower() == "info")
+        {
+            await HandleInfoCommandAsync(chatId, cancellationToken);
+        }
+        else if (messageText.ToLower() == "contacts")
         {
             await HandleContactsCommandAsync(chatId, cancellationToken);
         }
@@ -190,6 +200,23 @@ class Program
       "Разработчик ИИ: @EkatrinaSmith\n" +
       "Публичное представление: @MIR0_3\n" +
       "Создатель чатбота: @EvgeniyKasatkin \n",
+            cancellationToken: cancellationToken
+        );
+    }
+    private static async Task HandleStartCommandAsync(long chatId, CancellationToken cancellationToken)
+    {
+        var replyKeyboard = new ReplyKeyboardMarkup(new[]
+        {
+        new KeyboardButton[] { "info", "contacts" }
+    })
+        {
+            ResizeKeyboard = true
+        };
+
+        await botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "Выберите опцию ниже:",
+            replyMarkup: replyKeyboard,
             cancellationToken: cancellationToken
         );
     }
